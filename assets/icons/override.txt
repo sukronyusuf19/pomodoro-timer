@@ -1,0 +1,2 @@
+Placeholder for PWA icon png files (icon-192.png and icon-512.png).
+If missing, default browser profiles will apply standard launcher graphics.

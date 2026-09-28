@@ -1,0 +1,145 @@
+/* -------------------------------------------------------------
+ * POMODORO PRO - RESPONSIVE MEDIA QUERIES
+ * ------------------------------------------------------------- */
+
+/* Laptops & Small Desktops (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .app-container {
+    margin: 20px auto;
+    width: 95%;
+  }
+
+  .main-content {
+    grid-template-columns: 1fr; /* Stack panels vertically */
+    gap: 20px;
+  }
+
+  .timer-section {
+    width: 100%;
+  }
+
+  .info-sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Split tasks and stats/music side by side */
+    gap: 20px;
+  }
+
+  .stats-panel {
+    grid-column: span 2; /* Stretch stats panel to full width below on tablet */
+  }
+}
+
+/* Tablets & Large Mobiles (max-width: 768px) */
+@media (max-width: 768px) {
+  .info-sections-grid {
+    grid-template-columns: 1fr; /* Stack everything vertically on mobile/tablet */
+  }
+
+  .stats-panel {
+    grid-column: span 1;
+  }
+
+  .mode-cards-container {
+    grid-template-columns: 1fr; /* Stack Focus and Break cards vertically */
+    gap: 15px;
+  }
+
+  .timer-card {
+    padding: 20px 15px;
+  }
+
+  .progress-circle-wrapper {
+    width: 180px;
+    height: 180px;
+  }
+
+  .progress-ring {
+    width: 180px;
+    height: 180px;
+  }
+
+  .progress-ring circle {
+    r: 78px;
+    cx: 90px;
+    cy: 90px;
+    stroke-width: 6;
+  }
+
+  .progress-ring-fg {
+    stroke-dasharray: 490.08; /* 2 * PI * 78 */
+  }
+
+  .timer-display {
+    font-size: 2.5rem;
+  }
+
+  .timer-controls-panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #btnRestartSession {
+    grid-column: span 2; /* Span restart session button fully */
+  }
+
+  .sidebar-content {
+    width: 100%;
+    right: -100%;
+    padding: 20px;
+  }
+
+  .focus-timer-text {
+    font-size: 5rem;
+  }
+
+  #btnExitFocusScreen {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* Small Mobiles (max-width: 480px) */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 15px;
+  }
+
+  .logo h1 {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+
+  .timer-controls-panel {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .volume-sliders-grid {
+    grid-template-columns: 1fr; /* Stack volume sliders */
+    gap: 12px;
+  }
+
+  .custom-audio-pickers {
+    grid-template-columns: 1fr; /* Stack pickers */
+  }
+
+  .backup-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-picker-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .focus-timer-text {
+    font-size: 3.8rem;
+  }
+
+  .focus-minimal-controls {
+    gap: 12px;
+  }
+}

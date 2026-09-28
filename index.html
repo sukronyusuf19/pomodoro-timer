@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍅 50:00 - Pomodoro Pro</title>
+  <meta name="description" content="A premium coffee-aesthetic Pomodoro Timer with custom music, ambient sounds, local statistics, PWA support, and micro-interactions.">
+  
+  <!-- Manifest & Favicon -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4A2C2A">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animation.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="theme-coffee" data-mode="focus">
+  <!-- Interactive Gradient Background -->
+  <div class="bg-gradient-overlay" aria-hidden="true"></div>
+  <div class="particles-container" id="particlesContainer" aria-hidden="true"></div>
+
+  <!-- Main Container -->
+  <div class="app-container" id="appContainer">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo">
+        <i data-lucide="coffee" class="accent-color-icon"></i>
+        <h1>POMODORO PRO</h1>
+      </div>
+      <div class="header-actions">
+        <button id="btnFocusScreen" class="btn-icon" aria-label="Toggle Focus Screen Mode" title="Focus Screen">
+          <i data-lucide="maximize-2"></i>
+        </button>
+        <button id="btnFullscreen" class="btn-icon" aria-label="Toggle Fullscreen" title="Fullscreen">
+          <i data-lucide="expand"></i>
+        </button>
+        <button id="btnOpenSettings" class="btn-icon" aria-label="Open Settings" title="Settings (Ctrl + ,)">
+          <i data-lucide="settings"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <main class="main-content">
+      
+      <!-- Left side: The Timer & Controls -->
+      <section class="timer-section">
+        <!-- Dual Mode Cards Container -->
+        <div class="mode-cards-container">
+          <!-- Focus Card -->
+          <div class="timer-card active" id="cardFocus" data-target-mode="focus" role="button" tabindex="0" aria-label="Switch to Focus Mode">
+            <div class="card-glow"></div>
+            <div class="card-content">
+              <span class="mode-badge" data-i18n="badge_focus">FOCUS SESSION</span>
+              <div class="mode-icon-wrapper">
+                <i data-lucide="brain-circuit" class="timer-card-icon"></i>
+              </div>
+              
+              <!-- Circle Progress Wrapper -->
+              <div class="progress-circle-wrapper">
+                <svg class="progress-ring" width="220" height="220">
+                  <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="98" cx="110" cy="110"/>
+                  <circle id="ringFocus" class="progress-ring-fg" stroke="var(--accent)" stroke-width="8" fill="transparent" r="98" cx="110" cy="110"/>
+                </svg>
+                <div class="timer-display" id="timeFocus">50:00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Break Card -->
+          <div class="timer-card" id="cardBreak" data-target-mode="break" role="button" tabindex="0" aria-label="Switch to Break Mode">
+            <div class="card-glow"></div>
+            <div class="card-content">
+              <span class="mode-badge" data-i18n="badge_break">BREAK SESSION</span>
+              <div class="mode-icon-wrapper">
+                <i data-lucide="cup-soda" class="timer-card-icon"></i>
+              </div>
+
+              <!-- Circle Progress Wrapper -->
+              <div class="progress-circle-wrapper">
+                <svg class="progress-ring" width="220" height="220">
+                  <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="98" cx="110" cy="110"/>
+                  <circle id="ringBreak" class="progress-ring-fg" stroke="var(--accent)" stroke-width="8" fill="transparent" r="98" cx="110" cy="110"/>
+                </svg>
+                <div class="timer-display" id="timeBreak">10:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Control Buttons -->
+        <div class="timer-controls-panel glass-panel">
+          <button id="btnStart" class="btn btn-primary btn-lg" aria-label="Start Timer">
+            <i data-lucide="play"></i> <span data-i18n="btn_start">Start</span>
+          </button>
+          <button id="btnPause" class="btn btn-secondary btn-lg hidden" aria-label="Pause Timer">
+            <i data-lucide="pause"></i> <span data-i18n="btn_pause">Pause</span>
+          </button>
+          <button id="btnReset" class="btn btn-danger btn-lg" aria-label="Reset Timer">
+            <i data-lucide="rotate-ccw"></i> <span data-i18n="btn_reset">Reset</span>
+          </button>
+          <button id="btnSkip" class="btn btn-accent btn-lg" aria-label="Skip Session">
+            <i data-lucide="skip-forward"></i> <span data-i18n="btn_skip">Skip</span>
+          </button>
+          <button id="btnRestartSession" class="btn btn-accent-outline btn-lg" aria-label="Restart Current Session">
+            <i data-lucide="refresh-cw"></i> <span data-i18n="btn_restart">Restart</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right side: Tasks, Music, Stats -->
+      <section class="info-sections-grid">
+        
+        <!-- Task & Notes Block -->
+        <div class="tasks-panel glass-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="check-square"></i>
+              <h2 data-i18n="title_todo">To-Do List</h2>
+            </div>
+            <span class="task-count" id="taskCount">0 completed</span>
+          </div>
+          
+          <form class="task-input-container" id="taskForm">
+            <input type="text" id="taskInput" placeholder="Add a focus task..." autocomplete="off" aria-label="New Task Input">
+            <button type="submit" class="btn-icon-accent" aria-label="Add Task">
+              <i data-lucide="plus"></i>
+            </button>
+          </form>
+
+          <ul class="task-list" id="taskList" aria-label="Tasks List">
+            <!-- Dynamic task items go here -->
+          </ul>
+
+          <hr class="panel-divider">
+
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="edit-3"></i>
+              <h2 data-i18n="title_notes">Session Notes</h2>
+            </div>
+          </div>
+          <textarea class="notes-area" id="notesArea" placeholder="Write down ideas, notes, or scratchpads during your session..." aria-label="Quick notes"></textarea>
+        </div>
+
+        <!-- Audio, Music, Playlist & Ambient Sounds Panel -->
+        <div class="audio-panel glass-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="music-4"></i>
+              <h2 data-i18n="title_music_playlist">Music & Playlists</h2>
+            </div>
+            <div class="audio-global-controls">
+              <button id="btnMute" class="btn-icon-sm" aria-label="Mute Audio" title="Mute (M)">
+                <i data-lucide="volume-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Volume sliders -->
+          <div class="volume-sliders-grid">
+            <div class="volume-item">
+              <label for="sliderMusicVol"><i data-lucide="music"></i> <span data-i18n="vol_music">Music</span></label>
+              <input type="range" id="sliderMusicVol" min="0" max="100" value="70">
+              <span class="vol-percentage" id="valMusicVol">70%</span>
+            </div>
+            <div class="volume-item">
+              <label for="sliderNotifVol"><i data-lucide="bell"></i> <span data-i18n="vol_notif">Beep</span></label>
+              <input type="range" id="sliderNotifVol" min="0" max="100" value="80">
+              <span class="vol-percentage" id="valNotifVol">80%</span>
+            </div>
+          </div>
+
+          <!-- Ambient Sounds selector -->
+          <div class="ambient-sounds-section">
+            <span class="sub-section-title" data-i18n="sub_ambient">Ambient Sounds</span>
+            <div class="ambient-grid">
+              <button class="btn-ambient" data-ambient="rain" aria-label="Toggle Rain Ambient Sound">
+                <i data-lucide="cloud-rain"></i>
+                <span data-i18n="ambient_rain">Rain</span>
+              </button>
+              <button class="btn-ambient" data-ambient="forest" aria-label="Toggle Forest Ambient Sound">
+                <i data-lucide="trees"></i>
+                <span data-i18n="ambient_forest">Forest</span>
+              </button>
+              <button class="btn-ambient" data-ambient="cafe" aria-label="Toggle Cafe Ambient Sound">
+                <i data-lucide="coffee"></i>
+                <span data-i18n="ambient_cafe">Cafe</span>
+              </button>
+              <button class="btn-ambient" data-ambient="typing" aria-label="Toggle Keyboard Typing Sound">
+                <i data-lucide="keyboard"></i>
+                <span data-i18n="ambient_typing">Typing</span>
+              </button>
+              <button class="btn-ambient" data-ambient="noise" aria-label="Toggle White Noise Sound">
+                <i data-lucide="waves"></i>
+                <span data-i18n="ambient_white">Noise</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Playlist manager -->
+          <div class="playlist-section">
+            <span class="sub-section-title" data-i18n="sub_playlist">Focus Tracks</span>
+            
+            <div class="playlist-modes">
+              <button id="btnShuffle" class="btn-icon-text" aria-label="Toggle Shuffle">
+                <i data-lucide="shuffle"></i> <span data-i18n="mode_shuffle">Shuffle</span>
+              </button>
+              <button id="btnRepeat" class="btn-icon-text" aria-label="Toggle Repeat Mode" data-repeat="none">
+                <i data-lucide="repeat"></i> <span id="textRepeat" data-i18n="mode_repeat_off">Off</span>
+              </button>
+            </div>
+
+            <!-- Drag and drop zone & tracks -->
+            <div class="track-list-wrapper" id="trackDropZone">
+              <ul class="track-list" id="trackList" aria-label="Track list">
+                <li class="track-item active" data-index="0">
+                  <i data-lucide="disc" class="rotating-disc"></i>
+                  <span class="track-name">Default Focus Track</span>
+                  <span class="track-duration">Loop</span>
+                </li>
+                <!-- Dynamic custom tracks go here -->
+              </ul>
+              <div class="drag-drop-overlay">
+                <i data-lucide="upload-cloud"></i>
+                <span data-i18n="drag_drop_text">Drop MP3 files to add</span>
+              </div>
+            </div>
+
+            <!-- Custom file pickers -->
+            <div class="custom-audio-pickers">
+              <label class="btn btn-accent-outline btn-sm custom-file-label">
+                <i data-lucide="plus-circle"></i> <span data-i18n="add_music">Add Focus Music</span>
+                <input type="file" id="inputMusicFile" accept="audio/mp3,audio/wav" multiple style="display:none;">
+              </label>
+              <label class="btn btn-accent-outline btn-sm custom-file-label">
+                <i data-lucide="bell-ring"></i> <span data-i18n="choose_beep">Choose Alert sound</span>
+                <input type="file" id="inputNotifFile" accept="audio/*" style="display:none;">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics & Canvas Dashboard -->
+        <div class="stats-panel glass-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="line-chart"></i>
+              <h2 data-i18n="title_stats">Productivity Dashboard</h2>
+            </div>
+            <button id="btnExportCSV" class="btn btn-accent-outline btn-xs" aria-label="Export stats to CSV">
+              <i data-lucide="download"></i> <span>CSV</span>
+            </button>
+          </div>
+
+          <div class="streak-badge-container">
+            <div class="streak-stat">
+              <i data-lucide="flame" class="streak-fire-icon"></i>
+              <div>
+                <span class="stat-number" id="statsStreak">0</span>
+                <span class="stat-lbl" data-i18n="stat_streak">Day Streak</span>
+              </div>
+            </div>
+            <div class="streak-stat">
+              <i data-lucide="target" class="target-icon"></i>
+              <div>
+                <span class="stat-number"><span id="statsSessionsCount">0</span>/<span id="statsDailyTarget">8</span></span>
+                <span class="stat-lbl" data-i18n="stat_target">Daily Target</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="metric-title" data-i18n="metric_focus_time">Total Focus</span>
+              <span class="metric-value" id="statsTotalFocusTime">0m</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title" data-i18n="metric_completed">Completed</span>
+              <span class="metric-value" id="statsFocusCompleted">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title" data-i18n="metric_longest">Longest Focus</span>
+              <span class="metric-value" id="statsLongestFocus">0m</span>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <span class="sub-section-title" data-i18n="stats_weekly_chart">Weekly Productivity</span>
+            <canvas id="weeklyChart" height="140"></canvas>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- Settings Sidebar -->
+  <aside class="settings-sidebar" id="settingsSidebar" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="sidebar-content glass-panel">
+      <div class="sidebar-header">
+        <h2 id="settingsTitle" data-i18n="settings_title">Configuration</h2>
+        <button id="btnCloseSettings" class="btn-icon" aria-label="Close Settings">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="settings-sections">
+        
+        <!-- Timer Settings -->
+        <div class="settings-group">
+          <h3 data-i18n="set_durations">Intervals (Minutes)</h3>
+          <div class="settings-row-input">
+            <div>
+              <label for="inputFocusDuration" data-i18n="set_focus_dur">Focus</label>
+              <input type="number" id="inputFocusDuration" min="5" max="180" value="50">
+            </div>
+            <div>
+              <label for="inputBreakDuration" data-i18n="set_break_dur">Break</label>
+              <input type="number" id="inputBreakDuration" min="1" max="60" value="10">
+            </div>
+          </div>
+        </div>
+
+        <!-- Automation -->
+        <div class="settings-group">
+          <h3 data-i18n="set_automation">Automation</h3>
+          <label class="settings-checkbox">
+            <input type="checkbox" id="checkAutoStartFocus">
+            <span class="custom-chk"></span>
+            <span data-i18n="set_auto_focus">Auto Start Focus</span>
+          </label>
+          <label class="settings-checkbox">
+            <input type="checkbox" id="checkAutoStartBreak">
+            <span class="custom-chk"></span>
+            <span data-i18n="set_auto_break">Auto Start Break</span>
+          </label>
+        </div>
+
+        <!-- Customizations & Themes -->
+        <div class="settings-group">
+          <h3 data-i18n="set_theme">Theme Preset</h3>
+          <div class="theme-picker-grid">
+            <button class="theme-btn coffee active" data-theme="coffee" title="Coffee Aesthetic">
+              <span class="theme-dot" style="background:#2C1810;"></span>
+              <span>Coffee</span>
+            </button>
+            <button class="theme-btn dark" data-theme="dark" title="Dark Standard">
+              <span class="theme-dot" style="background:#1e1e24;"></span>
+              <span>Dark</span>
+            </button>
+            <button class="theme-btn amoled" data-theme="amoled" title="AMOLED Black">
+              <span class="theme-dot" style="background:#000000;"></span>
+              <span>AMOLED</span>
+            </button>
+            <button class="theme-btn ocean" data-theme="ocean" title="Ocean Blue">
+              <span class="theme-dot" style="background:#0b2545;"></span>
+              <span>Ocean</span>
+            </button>
+            <button class="theme-btn sakura" data-theme="sakura" title="Sakura Pink">
+              <span class="theme-dot" style="background:#3d1a22;"></span>
+              <span>Sakura</span>
+            </button>
+            <button class="theme-btn forest" data-theme="forest" title="Forest Green">
+              <span class="theme-dot" style="background:#0f2a1d;"></span>
+              <span>Forest</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Language & Alerts -->
+        <div class="settings-group">
+          <h3 data-i18n="set_general">General Settings</h3>
+          <div class="settings-select-row">
+            <label for="selectLanguage" data-i18n="set_lang">Language</label>
+            <select id="selectLanguage">
+              <option value="en">English</option>
+              <option value="id">Bahasa Indonesia</option>
+            </select>
+          </div>
+          
+          <label class="settings-checkbox mt-10">
+            <input type="checkbox" id="checkBrowserNotifications" checked>
+            <span class="custom-chk"></span>
+            <span data-i18n="set_browser_notif">System Notifications</span>
+          </label>
+          <label class="settings-checkbox">
+            <input type="checkbox" id="checkConfetti">
+            <span class="custom-chk"></span>
+            <span data-i18n="set_confetti">Target Confetti</span>
+          </label>
+        </div>
+
+        <!-- Custom Shortcuts -->
+        <div class="settings-group">
+          <h3 data-i18n="set_shortcuts">Keyboard Shortcuts</h3>
+          <ul class="shortcut-list">
+            <li><kbd>Space</kbd> <span data-i18n="sc_play_pause">Start / Pause</span></li>
+            <li><kbd>R</kbd> <span data-i18n="sc_reset">Reset Timer</span></li>
+            <li><kbd>S</kbd> <span data-i18n="sc_skip">Skip Session</span></li>
+            <li><kbd>F</kbd> <span data-i18n="sc_fullscreen">Fullscreen</span></li>
+            <li><kbd>M</kbd> <span data-i18n="sc_mute">Mute Audio</span></li>
+            <li><kbd>Ctrl + ,</kbd> <span data-i18n="sc_settings">Open Settings</span></li>
+          </ul>
+        </div>
+
+        <!-- Configuration Backup -->
+        <div class="settings-group">
+          <h3 data-i18n="set_backup">Data Backup</h3>
+          <div class="backup-actions">
+            <button id="btnExportJSON" class="btn btn-secondary btn-sm" aria-label="Export settings to JSON">
+              <i data-lucide="upload"></i> <span data-i18n="btn_export">Export Settings</span>
+            </button>
+            <label class="btn btn-danger-outline btn-sm">
+              <i data-lucide="download"></i> <span data-i18n="btn_import">Import Settings</span>
+              <input type="file" id="inputImportJSON" accept=".json" style="display:none;">
+            </label>
+            <button id="btnClearData" class="btn btn-danger btn-sm" aria-label="Reset all app data" style="grid-column: 1 / -1;">
+              <i data-lucide="trash-2"></i> <span data-i18n="btn_clear_all">Reset Data</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </aside>
+
+  <!-- Focus Screen Mode overlay -->
+  <div class="focus-screen-overlay" id="focusScreenOverlay" aria-hidden="true">
+    <button id="btnExitFocusScreen" class="btn btn-accent-outline" aria-label="Exit Focus Mode">
+      <i data-lucide="minimize-2"></i> <span data-i18n="btn_exit_focus">Exit Focus Mode</span>
+    </button>
+    
+    <div class="focus-screen-content">
+      <h2 id="focusScreenBadge" class="focus-badge">FOCUS SESSION</h2>
+      <div class="focus-timer-text" id="focusScreenTimerText">50:00</div>
+      
+      <!-- Interactive visualizer -->
+      <div class="focus-wave-container">
+        <div class="focus-wave wave-1"></div>
+        <div class="focus-wave wave-2"></div>
+        <div class="focus-wave wave-3"></div>
+      </div>
+      
+      <!-- Minimalist current task indicator -->
+      <div class="focus-task-indicator" id="focusScreenTask">
+        No active task. Select or add a task to focus on.
+      </div>
+      
+      <div class="focus-minimal-controls">
+        <button id="btnFocusPlay" class="btn btn-primary btn-icon-only" aria-label="Toggle timer play state"><i data-lucide="play"></i></button>
+        <button id="btnFocusSkip" class="btn btn-secondary btn-icon-only" aria-label="Skip session"><i data-lucide="skip-forward"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas class="confetti-canvas" id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <!-- Application core JS logic script modules -->
+  <script src="js/storage.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/notification.js"></script>
+  <script src="js/statistics.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- PWA SW Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('ServiceWorker registered with scope: ', reg.scope))
+          .catch((err) => console.error('ServiceWorker registration failed: ', err));
+      });
+    }
+  </script>
+</body>
+</html>
